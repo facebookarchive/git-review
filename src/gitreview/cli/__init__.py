@@ -18,13 +18,13 @@ import readline
 import sys
 import traceback
 
-from .exceptions import *
+from exceptions import *
 from . import tokenize
 
 # Import everything from our command and args submodules
 # into the top-level namespace
-from .command import *
-from .args import *
+from command import *
+from args import *
 
 
 class CLI(object):

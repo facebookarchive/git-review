@@ -20,9 +20,9 @@ import time
 
 from .. import proc
 
-from .exceptions import *
-from . import constants
-from . import obj as git_obj
+from exceptions import *
+import constants
+import obj as git_obj
 
 
 class GitTimezone(datetime.tzinfo):

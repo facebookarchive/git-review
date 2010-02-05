@@ -16,8 +16,8 @@
 #
 from .. import proc
 
-from .exceptions import *
-from . import constants
+from exceptions import *
+import constants
 
 
 class Config(object):

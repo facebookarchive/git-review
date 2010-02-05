@@ -20,7 +20,7 @@ import subprocess
 from .. import cli
 from .. import git
 
-from .exceptions import *
+from exceptions import *
 
 
 class FileIndexArgument(cli.Argument):

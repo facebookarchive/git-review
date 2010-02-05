@@ -14,9 +14,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-from .exceptions import *
-from . import command
-from . import tokenize
+from exceptions import *
+import command
+import tokenize
 
 
 class ParsedArgs(object):

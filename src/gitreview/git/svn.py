@@ -16,8 +16,8 @@
 #
 import re
 
-from .exceptions import *
-from . import commit as git_commit
+from exceptions import *
+import commit as git_commit
 
 __all__ = ['GitSvnError', 'get_svn_info', 'get_svn_url']
 

@@ -22,11 +22,11 @@ import tempfile
 
 from .. import proc
 
-from .exceptions import *
-from . import constants
-from . import commit as git_commit
-from . import diff as git_diff
-from . import obj as git_obj
+from exceptions import *
+import constants
+import commit as git_commit
+import diff as git_diff
+import obj as git_obj
 
 
 class Repository(object):

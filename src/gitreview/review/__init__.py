@@ -19,8 +19,8 @@ import tempfile
 
 from .. import git
 
-from .exceptions import *
-from . import cli_reviewer
+from exceptions import *
+import cli_reviewer
 
 CliReviewer = cli_reviewer.CliReviewer
 

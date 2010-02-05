@@ -21,8 +21,8 @@ This is a python package for interacting with git repositories.
 import os
 
 # Import all of the constants and exception types into the current namespace
-from .constants import *
-from .exceptions import *
+from constants import *
+from exceptions import *
 
 from . import obj
 from . import commit
