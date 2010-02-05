@@ -1,0 +1,178 @@
+#!/usr/local/bin/python -tt
+#
+# Copyright 2009-2010 Facebook, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+"""
+git-review - a tool to review changes in a git repository
+
+This tool provides an interactive shell for reviewing diffs in a git
+repository.  It accepts arguments similar to "git diff" for specifying the
+diffs to review.  When started, it walks the user through each file changed,
+prompting to open an external diff program or text editor for each file.
+
+Configuration:
+
+- GIT_REVIEW_DIFF
+  If set, this environment variable specifies the program to use to view diffs
+  for modified files.  If unset, the default diff program is tkdiff when
+  DISPLAY is set, and "vimdiff -R" when DISPLAY is unset.
+
+- GIT_REVIEW_VIEW, GIT_EDITOR, VISUAL, EDITOR
+  These environment variables are checked in order to find the program to use
+  to view new files.  If none of these are set, vi is used.
+"""
+
+import optparse
+import os
+import sys
+
+import gitreview.git as git
+import gitreview.review as review
+
+RETCODE_SUCCESS = 0
+RETCODE_ARGUMENTS_ERROR = 1
+
+f_progname = os.path.basename(sys.argv[0])
+
+
+class OptionsError(Exception):
+    pass
+
+
+class UsageError(Exception):
+    pass
+
+
+class NoDiffsError(Exception):
+    pass
+
+
+class Options(optparse.OptionParser):
+    def __init__(self):
+        optparse.OptionParser.__init__(self, add_help_option=False,
+                                        usage='%prog [options]')
+        self.add_option('-c', '--commit',
+                        action='store', dest='commit', default=None,
+                        help='Diff the specified commit against its parent')
+        self.add_option('--cached',
+                        action='store_true', dest='cached', default=False,
+                        help='Diff against the index instead of the working '
+                             'tree')
+        self.add_option('--git-dir',
+                        action='store', dest='gitDir',
+                        metavar='DIRECTORY', default=None,
+                        help='Path to the git repository directory')
+        self.add_option('--work-tree',
+                        action='store', dest='workTree',
+                        metavar='DIRECTORY', default=None,
+                        help='Path to the git repository working tree')
+        self.add_option('-?', '--help',
+                        action='callback', callback=self.__helpCallback,
+                        help='Print this help message and exit')
+
+    def __helpCallback(self, option, opt, value, parser):
+        raise UsageError()
+
+    def error(self, msg):
+        # This is called automatically by optparse when an error in the command
+        # line options is encountered.
+        raise OptionsError(msg)
+
+    def printUsage(self, file = sys.stdout):
+        self.print_usage(file = file)
+
+    def printHelp(self, file = sys.stdout):
+        self.print_help(file = file)
+
+    def __getattr__(self, name):
+        if name.startswith('__'):
+            raise AttributeError(name)
+
+        # Allow attributes of self.__options to be accessed directly
+        return getattr(self.__options, name)
+
+    def parseArgv(self, argv):
+        # parse the options
+        (self.__options, args) = self.parse_args(argv[1:])
+
+        # Parse the commit arguments
+        if self.__options.commit is not None:
+            # If --commit was specified, diff that commit against its parent
+            if self.__options.cached:
+                msg = '--commit and --cached are mutually exclusive'
+                raise OptionsError(msg)
+            if args:
+                msg = ('additional commit arguments may not be specified '
+                       'with --commit')
+                raise OptionsError(msg)
+
+            self.parentCommit = self.__options.commit + '^'
+            self.childCommit = self.__options.commit
+        else:
+            # Default parent and child commits, if not otherwise specified
+            if self.__options.cached:
+                self.parentCommit = git.COMMIT_HEAD
+                self.childCommit = git.COMMIT_INDEX
+            else:
+                self.parentCommit = git.COMMIT_INDEX
+                self.childCommit = git.COMMIT_WD
+
+            # Parse the remaining arguments
+            num_args = len(args)
+            if num_args == 1:
+                self.parentCommit = args[0]
+            elif num_args == 2:
+                if self.__options.cached:
+                    msg = 'cannot specify --cached with two commits'
+                    raise OptionsError(msg)
+                self.parentCommit = args[0]
+                self.childCommit = args[1]
+            elif num_args > 2:
+                raise OptionsError('trailing arguments: ' + ' '.join(args[2:]))
+
+
+def error_msg(msg):
+    sys.stderr.write('%s: error: %s\n' % (f_progname, msg))
+
+
+def warning_msg(msg):
+    sys.stderr.write('%s: warning: %s\n' % (f_progname, msg))
+
+
+def main(argv):
+    # Parse the command line options
+    options = Options()
+    try:
+        options.parseArgv(argv)
+    except OptionsError, error:
+        options.printUsage(sys.stderr)
+        error_msg(error)
+        return RETCODE_ARGUMENTS_ERROR
+    except UsageError, error:
+        options.printHelp()
+        return RETCODE_SUCCESS
+
+    # Get a Repository object
+    repo = git.get_repo(git_dir=options.gitDir,
+                        working_dir=options.workTree)
+
+    diff = repo.getDiff(options.parentCommit, options.childCommit)
+    rev = review.Review(repo, diff)
+
+    return review.CliReviewer(rev).run()
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))

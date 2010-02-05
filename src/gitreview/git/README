@@ -1,0 +1,13 @@
+This package provides a python API for accessing a git repository.  It is very
+similar in purpose to the GitPython library: http://gitorious.org/git-python
+Eventually it would be nice to switch to using GitPython, since it has a larger
+community supporting it.
+
+One of the bigger things that will probably require changing are the special
+":wd" and ":0" commit names used by this package.  The review code currently
+uses these to access the working directory and index as if they were commits.
+The review code will probably need to migrate away from this behavior in order
+to switch to GitPython.
+
+There may also be a few features in this package that need to be merged into
+GitPython in order to make the switch.
