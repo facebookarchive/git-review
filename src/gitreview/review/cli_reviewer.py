@@ -17,8 +17,8 @@
 import os
 import subprocess
 
-from .. import cli
-from .. import git
+import gitreview.cli as cli
+import gitreview.git as git
 
 from exceptions import *
 

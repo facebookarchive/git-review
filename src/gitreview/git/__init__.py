@@ -24,11 +24,11 @@ import os
 from constants import *
 from exceptions import *
 
-from . import obj
-from . import commit
-from . import config
-from . import diff
-from . import repo
+import obj
+import commit
+import config
+import diff
+import repo
 
 
 def is_git_dir(path):

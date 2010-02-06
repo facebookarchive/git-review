@@ -14,7 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-from .. import proc
+import gitreview.proc as proc
 
 from exceptions import *
 import constants

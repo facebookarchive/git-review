@@ -20,7 +20,7 @@ import stat
 import subprocess
 import tempfile
 
-from .. import proc
+import gitreview.proc as proc
 
 from exceptions import *
 import constants

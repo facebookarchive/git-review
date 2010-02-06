@@ -18,7 +18,7 @@ import datetime
 import os
 import time
 
-from .. import proc
+import gitreview.proc as proc
 
 from exceptions import *
 import constants

@@ -19,7 +19,7 @@ import sys
 import traceback
 
 from exceptions import *
-from . import tokenize
+import tokenize
 
 # Import everything from our command and args submodules
 # into the top-level namespace

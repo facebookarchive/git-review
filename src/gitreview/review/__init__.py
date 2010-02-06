@@ -17,7 +17,7 @@
 import os
 import tempfile
 
-from .. import git
+import gitreview.git as git
 
 from exceptions import *
 import cli_reviewer
