@@ -1,3 +1,11 @@
+Archived Repo
+=============
+**This is an archived project and is no longer supported or updated by Facebook. Please do not file issues or pull-requests against this repo. If you wish to continue to develop this code yourself, we recommend you fork it.**
+
+**Proceed and be bold!**
+
+git-review
+==========
 git-review is a tool for reviewing diffs in a git repository.
 
 It provides a simple CLI for stepping through the modified files, and viewing
